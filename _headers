@@ -1,0 +1,33 @@
+# Cloudflare Pages _headers 文件 — 为所有响应添加安全 HTTP 头
+# 文档：https://developers.cloudflare.com/pages/configuration/headers/
+
+# 对所有路径生效的安全头
+/*
+  # 严格传输安全：强制浏览器始终通过 HTTPS 访问，有效期1年
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  # 内容安全策略：限制资源加载来源，防止 XSS
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.bootcdn.net; style-src 'self' 'unsafe-inline' https://cdn.bootcdn.net; img-src 'self' data: https:; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';
+  # 禁止 MIME 类型嗅探
+  X-Content-Type-Options: nosniff
+  # 禁止页面被嵌入 iframe，防止点击劫持
+  X-Frame-Options: DENY
+  # Referrer 只向同源发送
+  Referrer-Policy: same-origin
+  # 权限策略：禁用不需要的浏览器 API（摄像头、麦克风、地理位置等）
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+
+# 静态资源缓存策略 — JS/CSS/图片/音频缓存30天
+/*.js
+  Cache-Control: public, max-age=2592000, immutable
+/*.css
+  Cache-Control: public, max-age=2592000, immutable
+/*.mp3
+  Cache-Control: public, max-age=2592000, immutable
+/*.png
+  Cache-Control: public, max-age=2592000, immutable
+/*.jpg
+  Cache-Control: public, max-age=2592000, immutable
+/*.jpeg
+  Cache-Control: public, max-age=2592000, immutable
+/*.webp
+  Cache-Control: public, max-age=2592000, immutable

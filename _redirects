@@ -1,0 +1,5 @@
+# Cloudflare Pages _redirects 文件 — 配置 URL 重定向规则
+# 文档：https://developers.cloudflare.com/pages/configuration/redirects/
+
+# 将 404 页面重定向到首页（纯静态博客无独立404页）
+/*    /index.html   200

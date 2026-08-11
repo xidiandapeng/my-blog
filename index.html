@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<!-- 声明文档类型为 HTML5，告诉浏览器以标准模式渲染页面 -->
+<html lang="zh-CN">
+<!-- 设置页面语言为简体中文，有利于搜索引擎优化和无障碍访问 -->
+
+<head>
+  <!-- head 区域：放置页面的元信息，不会在页面上直接显示 -->
+
+  <!-- 声明字符编码为 UTF-8，确保中文等非 ASCII 字符能正确显示 -->
+  <meta charset="UTF-8">
+
+  <!-- 设置视口（viewport），使页面在手机等移动设备上自适应缩放 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 页面标题，显示在浏览器标签栏上，也会被搜索引擎使用 -->
+  <title>清风博客 — 个人博客</title>
+
+  <!-- 搜索引擎描述，提高 SEO 效果 -->
+  <meta name="description" content="清风博客，一个精简清新的个人博客网站，记录技术笔记与生活随笔。">
+
+  <!-- ==================== 安全防护 Meta 标签 ==================== -->
+
+  <!-- CSP 内容安全策略：限制资源只能从同源和指定的 CDN 加载，防止 XSS 注入恶意脚本 -->
+  <!-- default-src 'self' — 默认只允许同源资源 -->
+  <!-- script-src — JS 只能从同源、bootcdn.net、以及内联脚本加载 -->
+  <!-- style-src — CSS 只能从同源、bootcdn.net 加载 -->
+  <!-- img-src — 图片允许同源、data URI、https -->
+  <!-- media-src — 音频/视频允许同源 -->
+  <!-- connect-src — AJAX/fetch 只允许同源 -->
+  <!-- object-src 'none' — 禁止 Flash/Java 插件 -->
+  <!-- base-uri 'self' — 限制 <base> 标签只能指向同源 -->
+  <!-- form-action 'self' — 限制表单提交只能发向同源 -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.bootcdn.net; style-src 'self' 'unsafe-inline' https://cdn.bootcdn.net; img-src 'self' data: https:; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
+
+  <!-- X-Content-Type-Options：禁止浏览器猜测 MIME 类型，防止内容嗅探攻击 -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+  <!-- X-Frame-Options：禁止页面被嵌入 iframe，防止点击劫持攻击 -->
+  <meta http-equiv="X-Frame-Options" content="DENY">
+
+  <!-- Referrer-Policy：只向同源请求发送完整的 Referrer，跨源请求不发 Referrer，保护用户隐私 -->
+  <meta name="referrer" content="same-origin">
+
+  <!-- 引入外部 CSS 样式文件 -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- 引入代码高亮库 highlight.js 的样式，从 CDN 加载 -->
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+
+  <!-- 引入 highlight.js 核心脚本，从 CDN 加载，defer 表示页面解析完后才执行 -->
+  <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+
+  <!-- 引入 marked.js — Markdown 解析库，从 CDN 加载 -->
+  <script src="https://cdn.bootcdn.net/ajax/libs/marked/12.0.2/marked.min.js" defer></script>
+</head>
+
+<body>
+  <!-- body 区域：页面的可见内容都放在这里 -->
+
+  <!-- ==================== 顶部导航栏 ==================== -->
+  <!-- nav 标签：语义化标签，表示导航区域 -->
+  <nav class="navbar">
+    <!-- 导航栏内部容器，用于限制宽度和居中 -->
+    <div class="nav-container">
+
+      <!-- 博客 Logo / 标题，点击后回到首页 -->
+      <a href="#" class="nav-logo" onclick="goHome(); return false;">
+        🍃 清风博客 <!-- 使用 emoji 作为简易 Logo，return false 阻止默认的跳转行为 -->
+      </a>
+
+      <!-- 导航菜单列表 -->
+      <ul class="nav-menu">
+
+        <!-- 首页按钮，class="active" 表示当前选中状态，data-nav="home" 供 JS 高亮定位 -->
+        <li><a href="#" class="nav-link active" data-nav="home" onclick="showHome(); return false;">首页</a></li>
+
+        <!-- 分类按钮，点击后展开分类列表，data-nav="categories" -->
+        <li><a href="#" class="nav-link" data-nav="categories" onclick="showCategories(); return false;">分类</a></li>
+
+        <!-- 归档按钮，按时间线展示所有文章，data-nav="archive" -->
+        <li><a href="#" class="nav-link" data-nav="archive" onclick="showArchive(); return false;">归档</a></li>
+
+        <!-- 关于按钮，展示博主个人信息，data-nav="about" -->
+        <li><a href="#" class="nav-link" data-nav="about" onclick="showAbout(); return false;">关于</a></li>
+
+        <!-- 搜索输入框（在导航栏右侧），oninput 事件在每次输入时调用搜索函数 -->
+        <li>
+          <input type="text" class="nav-search" placeholder="搜索文章…" oninput="handleSearch(this.value)">
+        </li>
+
+        <!-- 音乐播放按钮（点击开关背景音乐），id="music-btn" 供 JS 控制 -->
+        <li><a href="#" class="nav-link" onclick="toggleMusic(); return false;" id="music-btn" title="点击播放/暂停背景音乐">🎵</a></li>
+
+        <!-- 主题切换按钮（日/夜间模式），点击后调用 toggleTheme 函数 -->
+        <li><a href="#" class="nav-link" onclick="toggleTheme(); return false;" id="theme-btn">🌙</a></li>
+
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ==================== 背景音乐播放器 ==================== -->
+  <!-- audio 标签：HTML5 音频播放元素，不可见（无 controls 属性），由 JS 控制播放/暂停 -->
+  <!-- loop 属性：单曲循环播放，音乐结束后自动重新开始 -->
+  <!-- preload="auto"：页面加载时预加载音频文件，减少首次播放延迟 -->
+  <!-- src 指向音乐文件路径，请将你的 mp3 文件放到网站根目录并命名为 bgm.mp3 -->
+  <audio id="bgm-audio" loop preload="auto" src="bgm.mp3"></audio>
+
+  <!-- ==================== 主内容区域 ==================== -->
+  <!-- main 标签：页面的主要内容区域 -->
+  <main class="main-content">
+
+    <!-- 动态内容容器：所有页面（首页文章列表、文章详情、分类页等）的 HTML 都会被 JS 注入到这个 div 中 -->
+    <div id="app"></div>
+
+  </main>
+
+  <!-- ==================== 底部区域 ==================== -->
+  <!-- footer 标签：语义化标签，表示页面底部信息 -->
+  <footer class="footer">
+    <p>&copy; 2026 清风博客 · 使用 ❤️ 构建 · <a href="#" onclick="showAbout(); return false;">关于我</a></p>
+  </footer>
+
+  <!-- 顶部"回到顶部"按钮，默认隐藏，滚动超过一定距离后显示 -->
+  <button id="back-to-top" onclick="scrollToTop()" title="回到顶部">↑</button>
+
+  <!-- ==================== 引入 JavaScript 文件 ==================== -->
+  <!-- 先引入文章数据文件（定义 POSTS 数组），必须在 app.js 之前 -->
+  <script src="js/posts.js"></script>
+
+  <!-- 再引入核心逻辑文件（页面渲染、路由、搜索等功能） -->
+  <script src="js/app.js"></script>
+
+</body>
+
+</html>

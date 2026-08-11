@@ -1,0 +1,1646 @@
+/* ================================================================
+   style.css — 清风博客样式表（美化版 v2）
+   设计理念：精简、清新、舒适阅读
+   色彩方案：以薄荷绿(#4CAF96)为主色调，白色为背景，灰阶层次分明
+   布局策略：移动优先，Flexbox+Grid 响应式适配，宽容器(1200px)
+   美化要点：
+     1. 首页 Hero 横幅 — 渐变背景 + 大标题 + 简介 + 统计数字
+     2. 文章卡片网格布局 — 双列展示，带渐变封面色块
+     3. 卡片悬停动画 — 上移 + 阴影加深 + 封面色块缩放
+     4. 渐入动画 — 页面内容滚动到视口时淡入上滑
+     5. 分类卡片 — 大图标 + 渐变背景
+     6. 归档时间线 — 左侧装饰线 + 圆点标记
+     7. 导航栏 — 毛玻璃效果 + 滚动阴影
+   ================================================================ */
+
+
+/* ==================== CSS 变量（主题色系定义）==================== */
+
+/* :root 选择器匹配文档根元素（<html>），在此定义全局 CSS 变量 */
+:root {
+  /* 主色调 — 清新薄荷绿，用于 Logo、链接、按钮、标签等强调元素 */
+  --primary: #4CAF96;
+  /* 主色调浅色版 — 用于渐变的起点 */
+  --primary-light: #6BC5B0;
+  /* 主色调深色版 — 用于渐变终点和悬停态 */
+  --primary-dark: #2D8C77;
+  /* 主色调极浅版 — 用于 Hero 区域背景渐变 */
+  --primary-tint: #e8f5f1;
+  /* 主色调悬停态 — 比主色稍深，鼠标悬停时使用 */
+  --primary-hover: #3d9a82;
+  /* 背景色 — 极浅灰白，营造柔和的阅读背景 */
+  --bg: #f5f7fa;
+  /* 卡片背景色 — 纯白，与页面背景形成微弱层次 */
+  --card-bg: #ffffff;
+  /* 主文字色 — 深灰偏黑，保证可读性但不刺眼 */
+  --text: #2c3e50;
+  /* 次要文字色 — 中灰，用于日期、摘要等辅助信息 */
+  --text-secondary: #7f8c8d;
+  /* 边框色 — 浅灰，用于卡片边框和分割线 */
+  --border: #e8ecf0;
+  /* 阴影颜色 — 用于卡片阴影，低透明度黑 */
+  --shadow: rgba(0, 0, 0, 0.06);
+  /* 阴影加深 — 用于悬停时的卡片阴影 */
+  --shadow-hover: rgba(0, 0, 0, 0.12);
+  /* 标签背景色 — 主色的低透明度版本，用于标签徽章背景 */
+  --tag-bg: rgba(76, 175, 150, 0.1);
+  /* 导航栏背景 — 带毛玻璃效果的半透明白 */
+  --nav-bg: rgba(255, 255, 255, 0.85);
+  /* 容器最大宽度 — 1200px，大屏时内容更宽 */
+  --container-width: 1200px;
+  /* 文章内容区宽度 — 820px，阅读正文时不会过宽 */
+  --reading-width: 820px;
+}
+
+/* 夜间模式变量覆盖 — 当 html 元素具有 dark 类时生效 */
+html.dark {
+  /* 主色调保持不变 */
+  --primary: #4CAF96;
+  /* 浅色版稍亮 */
+  --primary-light: #7DD3BC;
+  /* 深色版 */
+  --primary-dark: #2D8C77;
+  /* 极浅版改为深色，用于夜间 Hero 背景 */
+  --primary-tint: #1e2a26;
+  /* 悬停色稍亮 */
+  --primary-hover: #5fbb9f;
+  /* 夜间背景色 — 深灰蓝黑 */
+  --bg: #16171f;
+  /* 卡片背景色 — 略浅于页面背景的深色 */
+  --card-bg: #21232e;
+  /* 主文字色 — 浅灰白，夜间模式下的主文本 */
+  --text: #d4d8e0;
+  /* 次要文字色 — 中灰 */
+  --text-secondary: #8b90a0;
+  /* 边框色 — 深色边框 */
+  --border: #353846;
+  /* 阴影颜色 — 夜间模式阴影更深 */
+  --shadow: rgba(0, 0, 0, 0.3);
+  /* 悬停阴影 */
+  --shadow-hover: rgba(0, 0, 0, 0.5);
+  /* 标签背景 — 主色低透明度 */
+  --tag-bg: rgba(76, 175, 150, 0.15);
+  /* 导航栏背景 — 半透明深色 */
+  --nav-bg: rgba(33, 35, 46, 0.85);
+}
+
+
+/* ==================== 全局重置 ==================== */
+
+/* * 通配符选择器 — 匹配所有元素，进行统一的默认值重置 */
+* {
+  /* box-sizing: border-box 让 padding 和 border 不增加元素总尺寸 */
+  box-sizing: border-box;
+  /* 移除所有元素的默认外边距 */
+  margin: 0;
+  /* 移除所有元素的默认内边距 */
+  padding: 0;
+}
+
+/* body 全局样式 — 设置字体、背景色、文字色等基础外观 */
+body {
+  /* 字体族：优先使用系统默认无衬线字体栈，兼容各平台 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  /* 字号 16px，适合阅读的基础大小 */
+  font-size: 16px;
+  /* 行高 1.8，宽松行距提升阅读舒适度 */
+  line-height: 1.8;
+  /* 背景色引用 CSS 变量 */
+  background-color: var(--bg);
+  /* 文字色引用 CSS 变量 */
+  color: var(--text);
+  /* 过渡动画：背景色和文字色变化时平滑过渡 0.3 秒（主题切换时不突兀） */
+  transition: background-color 0.3s, color 0.3s;
+  /* 顶部微纹理 — 极淡的径向渐变增添层次感 */
+  background-image: radial-gradient(circle at 20% 0%, var(--primary-tint) 0%, transparent 40%);
+  /* 背景不重复 */
+  background-repeat: no-repeat;
+  /* 背景固定不随滚动 */
+  background-attachment: fixed;
+}
+
+/* a 标签全局样式 — 链接颜色和下划线控制 */
+a {
+  /* 链接颜色使用主色调 */
+  color: var(--primary);
+  /* 默认无下划线，保持清爽 */
+  text-decoration: none;
+  /* 链接颜色变化时平滑过渡 */
+  transition: color 0.2s;
+}
+
+/* 链接悬停态 — 颜色变深 */
+a:hover {
+  color: var(--primary-hover);
+}
+
+/* img 全局样式 */
+img {
+  /* 图片最大宽度 100%，防止溢出容器 */
+  max-width: 100%;
+  /* 高度自适应，保持比例 */
+  height: auto;
+}
+
+/* ul、ol、li 默认样式重置 — 去除默认的项目符号缩进 */
+ul, ol {
+  /* 继承父级字体设置 */
+  font: inherit;
+}
+
+
+/* ==================== 导航栏 ==================== */
+
+/* .navbar 顶部导航栏容器 — 固定在页面顶部 */
+.navbar {
+  /* 背景色使用半透明背景（毛玻璃效果的基础） */
+  background-color: var(--nav-bg);
+  /* 底部 1px 边框，与内容区形成视觉分割 */
+  border-bottom: 1px solid var(--border);
+  /* position: sticky 使导航栏滚动到顶部时固定 */
+  position: sticky;
+  /* top: 0 固定在视口顶部 */
+  top: 0;
+  /* z-index: 100 确保导航栏在最上层 */
+  z-index: 100;
+  /* 毛玻璃模糊效果 — backdrop-filter 实现磨砂玻璃质感 */
+  backdrop-filter: blur(12px);
+  /* Safari 兼容前缀 */
+  -webkit-backdrop-filter: blur(12px);
+  /* 底部阴影，增强层次感 */
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+/* .nav-container 导航栏内部容器 — 限制最大宽度并居中 */
+.nav-container {
+  /* 最大宽度使用变量 1200px，大屏时内容更宽 */
+  max-width: var(--container-width);
+  /* 上下 auto 左右 auto 实现水平居中 */
+  margin: 0 auto;
+  /* 使用 Flexbox 布局 */
+  display: flex;
+  /* 主轴两端对齐：Logo 在左，菜单在右 */
+  justify-content: space-between;
+  /* 交叉轴垂直居中 */
+  align-items: center;
+  /* 上下内边距 14px，左右 24px */
+  padding: 14px 24px;
+}
+
+/* .nav-logo 导航栏 Logo / 博客名称 */
+.nav-logo {
+  /* 字号 22px，比正文稍大 */
+  font-size: 22px;
+  /* 字重 700（粗体） */
+  font-weight: 700;
+  /* 颜色使用主色调 */
+  color: var(--primary);
+  /* flex 布局，让 emoji 和文字水平排列 */
+  display: flex;
+  /* 交叉轴居中 */
+  align-items: center;
+  /* emoji 和文字间距 8px */
+  gap: 8px;
+  /* 悬停时颜色变深 */
+  transition: color 0.2s;
+}
+
+/* .nav-menu 导航菜单列表 */
+.nav-menu {
+  /* 列表样式：flex 水平排列 */
+  display: flex;
+  /* 菜单项间距 24px */
+  gap: 24px;
+  /* 垂直居中对齐 */
+  align-items: center;
+  /* 移除列表默认样式 */
+  list-style: none;
+}
+
+/* .nav-link 导航菜单链接按钮 */
+.nav-link {
+  /* 颜色使用次要文字色 */
+  color: var(--text-secondary);
+  /* 字号 15px，略小于正文 */
+  font-size: 15px;
+  /* 相对定位，为 active 下划线做准备 */
+  position: relative;
+  /* 内边距 6px，增加点击区域 */
+  padding: 6px 2px;
+  /* 颜色变化平滑过渡 */
+  transition: color 0.2s;
+  /* 鼠标指针显示为手型，提示可点击 */
+  cursor: pointer;
+}
+
+/* 导航链接悬停态 — 颜色变为文字主色 */
+.nav-link:hover {
+  color: var(--text);
+}
+
+/* 导航链接选中态（.active）— 当前所在页面的导航按钮高亮 */
+.nav-link.active {
+  /* 颜色使用主色调 */
+  color: var(--primary);
+  /* 字重加粗 */
+  font-weight: 600;
+}
+
+/* 选中态导航链接的底部下划线 — 使用伪元素实现 */
+.nav-link.active::after {
+  /* content 为空，仅作为装饰条 */
+  content: '';
+  /* 绝对定位，相对于 .nav-link */
+  position: absolute;
+  /* 距底部 0 */
+  bottom: 0;
+  /* 水平居中 */
+  left: 50%;
+  /* 通过 transform 向左偏移自身宽度的 50%，实现真正居中 */
+  transform: translateX(-50%);
+  /* 下划线宽度 28px */
+  width: 28px;
+  /* 下划线高度 3px */
+  height: 3px;
+  /* 背景为渐变色 */
+  background: linear-gradient(90deg, var(--primary-light), var(--primary));
+  /* 圆角 2px */
+  border-radius: 2px;
+}
+
+/* .nav-search 导航栏搜索输入框 */
+.nav-search {
+  /* 输入框宽度 180px */
+  width: 180px;
+  /* 内边距：上下 8px，左右 14px */
+  padding: 8px 14px;
+  /* 字号 14px */
+  font-size: 14px;
+  /* 边框 1px 浅灰 */
+  border: 1px solid var(--border);
+  /* 圆角 20px（胶囊形） */
+  border-radius: 20px;
+  /* 背景色引用变量 */
+  background-color: var(--bg);
+  /* 文字色引用变量 */
+  color: var(--text);
+  /* 所有属性变化平滑过渡 0.2 秒 */
+  transition: all 0.2s;
+  /* 去除浏览器默认聚焦轮廓（用自定义聚焦样式替代） */
+  outline: none;
+}
+
+/* 搜索框聚焦态 — 边框变为主色调，带轻微阴影 */
+.nav-search:focus {
+  /* 边框色变为主色调 */
+  border-color: var(--primary);
+  /* 添加主色调低透明度阴影，模拟聚焦光晕 */
+  box-shadow: 0 0 0 3px rgba(76, 175, 150, 0.15);
+}
+
+/* .nav-search 的 placeholder 文字样式 */
+.nav-search::placeholder {
+  /* 颜色使用次要文字色 */
+  color: var(--text-secondary);
+}
+
+/* #music-btn 导航栏音乐按钮 — 与主题切换按钮风格一致 */
+#music-btn {
+  /* 字号 17px，Emoji 稍大于文字导航项 */
+  font-size: 17px;
+  /* 行高 1 */
+  line-height: 1;
+  /* 悬停时缩放放大，增强交互反馈 */
+  transition: transform 0.2s;
+}
+
+/* 音乐按钮悬停态 — 轻微放大 */
+#music-btn:hover {
+  /* 放大 1.2 倍 */
+  transform: scale(1.2);
+}
+
+/* #music-btn.playing 音乐播放中状态 — 音符旋转动画 */
+#music-btn.playing {
+  /* 动画名称：music-rotate，持续时间 3 秒，无限循环，匀速 */
+  animation: music-rotate 3s linear infinite;
+  /* 颜色变为主色调，突出"正在播放"状态 */
+  color: var(--primary);
+}
+
+/* @keyframes music-rotate 音乐图标旋转动画关键帧 */
+@keyframes music-rotate {
+  /* 0% 起始位置：不旋转 */
+  from { transform: rotate(0deg); }
+  /* 100% 结束位置：旋转 360 度（完整一圈） */
+  to { transform: rotate(360deg); }
+}
+
+
+/* ==================== 主内容区域 ==================== */
+
+/* .main-content 主内容区域 */
+.main-content {
+  /* 最大宽度 1200px，与导航栏一致 */
+  max-width: var(--container-width);
+  /* 水平居中 */
+  margin: 0 auto;
+  /* 上下内边距 0（Hero 区域自带间距），左右 24px */
+  padding: 0 24px;
+  /* 底部内边距留足空间，避免内容紧贴页脚 */
+  padding-bottom: 60px;
+  /* 最小高度确保页脚在底部 */
+  min-height: calc(100vh - 220px);
+}
+
+
+/* ==================== Hero 横幅区域（首页顶部欢迎区）==================== */
+
+/* .hero Hero 横幅区域 — 首页顶部的醒目欢迎区 */
+.hero {
+  /* 使用相对定位，为内部装饰提供基准 */
+  position: relative;
+  /* 内边距：上 64px 下 56px，左右 24px */
+  padding: 64px 24px 56px;
+  /* 文字居中 */
+  text-align: center;
+  /* 上底部外边距，与下方内容拉开间距 */
+  margin-bottom: 48px;
+  /* 圆角 20px */
+  border-radius: 20px;
+  /* 渐变背景 — 从主色浅版到主色，营造清新氛围 */
+  background: linear-gradient(135deg, var(--primary-tint) 0%, var(--primary-light) 100%);
+  /* 溢出隐藏（装饰元素不超出圆角区域） */
+  overflow: hidden;
+  /* 底部阴影 */
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+/* 夜间模式下 Hero 减弱渐变亮度 */
+html.dark .hero {
+  /* 夜间渐变稍深 */
+  background: linear-gradient(135deg, var(--primary-tint) 0%, var(--primary-dark) 100%);
+}
+
+/* .hero::before Hero 背景装饰 — 右上角大圆光晕 */
+.hero::before {
+  /* 装饰内容为空 */
+  content: '';
+  /* 绝对定位 */
+  position: absolute;
+  /* 距顶部 -40px */
+  top: -40px;
+  /* 距右侧 -40px */
+  right: -40px;
+  /* 宽高 200px */
+  width: 200px;
+  height: 200px;
+  /* 圆形 */
+  border-radius: 50%;
+  /* 白色半透明，模拟光晕 */
+  background: rgba(255, 255, 255, 0.15);
+  /* 指针事件穿透（不遮挡点击） */
+  pointer-events: none;
+}
+
+/* .hero::after Hero 背景装饰 — 左下角大圆光晕 */
+.hero::after {
+  /* 装饰内容为空 */
+  content: '';
+  /* 绝对定位 */
+  position: absolute;
+  /* 距底部 -30px */
+  bottom: -30px;
+  /* 距左侧 -30px */
+  left: -30px;
+  /* 宽高 160px */
+  width: 160px;
+  height: 160px;
+  /* 圆形 */
+  border-radius: 50%;
+  /* 白色半透明，模拟光晕 */
+  background: rgba(255, 255, 255, 0.1);
+  /* 指针事件穿透 */
+  pointer-events: none;
+}
+
+/* .hero-emoji Hero 区域顶部 Emoji 图标 */
+.hero-emoji {
+  /* 字号 48px */
+  font-size: 48px;
+  /* 底部外边距 12px */
+  margin-bottom: 12px;
+  /* 大图标上方间距 */
+  display: block;
+}
+
+/* .hero-title Hero 大标题 */
+.hero-title {
+  /* 字号 36px */
+  font-size: 36px;
+  /* 字重 800（特粗） */
+  font-weight: 800;
+  /* 颜色为白色，在渐变背景上醒目 */
+  color: #fff;
+  /* 底部外边距 12px */
+  margin-bottom: 12px;
+  /* 行高 1.3 */
+  line-height: 1.3;
+  /* 相对定位（在装饰圆之上） */
+  position: relative;
+  /* z-index 1 确保在装饰圆之上 */
+  z-index: 1;
+}
+
+/* .hero-subtitle Hero 副标题/简介 */
+.hero-subtitle {
+  /* 字号 16px */
+  font-size: 16px;
+  /* 颜色为白色高不透明度（提升对比度） */
+  color: rgba(255, 255, 255, 0.95);
+  /* 底部外边距 28px */
+  margin-bottom: 28px;
+  /* 相对定位 */
+  position: relative;
+  /* z-index 1 */
+  z-index: 1;
+  /* 最大宽度 480px，居中 */
+  max-width: 480px;
+  /* 左右 auto 居中 */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* .hero-stats Hero 统计数字行 */
+.hero-stats {
+  /* flex 布局 */
+  display: flex;
+  /* 水平居中排列 */
+  justify-content: center;
+  /* 间距 48px */
+  gap: 48px;
+  /* 相对定位 */
+  position: relative;
+  /* z-index 1 */
+  z-index: 1;
+}
+
+/* .hero-stat 单个统计项 */
+.hero-stat {
+  /* 文字居中 */
+  text-align: center;
+}
+
+/* .hero-stat-num 统计数字 */
+.hero-stat-num {
+  /* 字号 28px */
+  font-size: 28px;
+  /* 字重 800 */
+  font-weight: 800;
+  /* 颜色白色 */
+  color: #fff;
+  /* 行高 1.2 */
+  line-height: 1.2;
+}
+
+/* .hero-stat-label 统计标签 */
+.hero-stat-label {
+  /* 字号 14px（从13px增大提升可读性） */
+  font-size: 14px;
+  /* 颜色白色高不透明度 */
+  color: rgba(255, 255, 255, 0.9);
+  /* 底部外边距 0 */
+  margin-bottom: 0;
+}
+
+
+/* ==================== 页面标题 ==================== */
+
+/* .page-title 页面大标题（如"最新文章""文章分类"等） */
+.page-title {
+  /* 字号 26px */
+  font-size: 26px;
+  /* 字重 700 */
+  font-weight: 700;
+  /* 颜色为主文字色 */
+  color: var(--text);
+  /* 底部外边距 6px */
+  margin-bottom: 6px;
+}
+
+/* .page-subtitle 页面副标题（如文章总数） */
+.page-subtitle {
+  /* 颜色为次要文字色 */
+  color: var(--text-secondary);
+  /* 字号 14px */
+  font-size: 14px;
+  /* 底部外边距 28px，与下方内容拉开距离 */
+  margin-bottom: 28px;
+}
+
+
+/* ==================== 文章卡片网格 ==================== */
+
+/* .post-grid 文章卡片网格容器 — 双列布局 */
+.post-grid {
+  /* CSS Grid 网格布局 */
+  display: grid;
+  /* 两列等宽，间距 20px */
+  grid-template-columns: repeat(2, 1fr);
+  /* 行间距 20px */
+  gap: 20px;
+}
+
+/* .post-card 文章卡片 — 网格中的单篇文章 */
+.post-card {
+  /* 背景色为卡片背景（白色/深色） */
+  background-color: var(--card-bg);
+  /* 圆角 16px */
+  border-radius: 16px;
+  /* 边框 1px 浅灰 */
+  border: 1px solid var(--border);
+  /* 阴影效果，卡片浮动感 */
+  box-shadow: 0 2px 8px var(--shadow);
+  /* 鼠标指针为手型，提示可点击 */
+  cursor: pointer;
+  /* 所有属性变化平滑过渡 0.3 秒 */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* 溢出隐藏（封面圆角不超出卡片） */
+  overflow: hidden;
+  /* 相对定位 */
+  position: relative;
+}
+
+/* 文章卡片悬停态 — 阴影加深、轻微上移，营造可交互的反馈 */
+.post-card:hover {
+  /* 阴影加深 */
+  box-shadow: 0 8px 24px var(--shadow-hover);
+  /* 向上偏移 4px，模拟浮起效果 */
+  transform: translateY(-4px);
+}
+
+/* .post-cover 文章封面渐变色块 — 每篇文章不同色 */
+.post-cover {
+  /* 高度 120px */
+  height: 120px;
+  /* 背景渐变 —— 内联 style 中动态设定具体颜色 */
+  /* flex 布局居中 */
+  display: flex;
+  /* 水平居中 */
+  justify-content: center;
+  /* 交叉轴居中 */
+  align-items: center;
+  /* 字号 36px（封面内的 Emoji 大图标） */
+  font-size: 36px;
+  /* 过渡：悬停时缩放动画 */
+  transition: transform 0.4s ease;
+}
+
+/* 卡片悬停时封面放大 */
+.post-card:hover .post-cover {
+  /* 放大 1.08 倍 */
+  transform: scale(1.08);
+}
+
+/* .post-body 文章卡片正文区域 */
+.post-body {
+  /* 内边距 20px */
+  padding: 20px;
+}
+
+/* .post-category 文章分类标签 — 卡片左上角的小标签 */
+.post-category {
+  /* 行内块元素 */
+  display: inline-block;
+  /* 内边距 3px 10px */
+  padding: 3px 10px;
+  /* 字号 12px */
+  font-size: 12px;
+  /* 字重 600 */
+  font-weight: 600;
+  /* 文字颜色白色（在封面色块上显示时） */
+  color: #fff;
+  /* 背景色透明（叠加在封面上） */
+  background: rgba(0, 0, 0, 0.15);
+  /* 圆角 10px */
+  border-radius: 10px;
+  /* 底部外边距 0（在封面内定位用 absolute） */
+  margin-bottom: 0;
+  /* 鼠标指针手型 */
+  cursor: pointer;
+  /* 绝对定位在封面区域左上角 */
+  position: absolute;
+  /* 距顶 12px */
+  top: 12px;
+  /* 距左 12px */
+  left: 12px;
+  /* z-index 2 在封面上层 */
+  z-index: 2;
+  /* 背景色变化过渡 */
+  transition: background-color 0.2s;
+}
+
+/* .post-category 悬停态 */
+.post-category:hover {
+  /* 背景变深 */
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* .post-title 卡片内的文章标题 */
+.post-title {
+  /* 字号 18px */
+  font-size: 18px;
+  /* 字重 600 */
+  font-weight: 600;
+  /* 颜色为主文字色 */
+  color: var(--text);
+  /* 底部外边距 6px */
+  margin-bottom: 6px;
+  /* 行高 1.4，标题行距紧凑一些 */
+  line-height: 1.4;
+  /* 文字溢出行数限制为 2 行 */
+  display: -webkit-box;
+  /* WebKit 行列 box */
+  -webkit-line-clamp: 2;
+  /* 垂直排列 */
+  -webkit-box-orient: vertical;
+  /* 溢出隐藏 */
+  overflow: hidden;
+}
+
+/* .post-meta 卡片内的文章元信息（日期等） */
+.post-meta {
+  /* 颜色为次要文字色 */
+  color: var(--text-secondary);
+  /* 字号 13px */
+  font-size: 13px;
+  /* 底部外边距 8px */
+  margin-bottom: 8px;
+}
+
+/* .post-excerpt 卡片内的文章摘要 */
+.post-excerpt {
+  /* 颜色为主文字色（比次灰色更深，提升可读性） */
+  color: var(--text);
+  /* 透明度 0.7 让摘要略次于标题层次但不过淡 */
+  opacity: 0.7;
+  /* 字号 14px */
+  font-size: 14px;
+  /* 底部外边距 12px */
+  margin-bottom: 12px;
+  /* 行高 1.6 */
+  line-height: 1.6;
+  /* 摘要限制 3 行，超出省略 */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* .post-tags 卡片底部标签容器 */
+.post-tags {
+  /* flex 布局 */
+  display: flex;
+  /* 水平排列，自动换行 */
+  flex-wrap: wrap;
+  /* 标签间距 6px */
+  gap: 6px;
+}
+
+/* .tag 单个标签徽章 */
+.tag {
+  /* 行内块 */
+  display: inline-block;
+  /* 内边距 2px 8px */
+  padding: 2px 8px;
+  /* 字号 12px */
+  font-size: 12px;
+  /* 颜色为主色调 */
+  color: var(--primary);
+  /* 背景为标签背景色 */
+  background-color: var(--tag-bg);
+  /* 圆角 6px */
+  border-radius: 6px;
+  /* 鼠标指针手型 */
+  cursor: pointer;
+  /* 背景色变化平滑过渡 */
+  transition: background-color 0.2s;
+}
+
+/* .tag 悬停态 — 背景色变为主色调，文字变白 */
+.tag:hover {
+  background-color: var(--primary);
+  /* 文字色变白 */
+  color: #fff;
+}
+
+
+/* ==================== 文章详情页 ==================== */
+
+/* .post-detail-wrap 详情页外层容器 — 限制阅读宽度 */
+.post-detail-wrap {
+  /* 最大宽度 820px（阅读宽度），眼睛不需要大幅左右扫视 */
+  max-width: var(--reading-width);
+  /* 居中 */
+  margin: 0 auto;
+  /* 顶部内边距 40px */
+  padding-top: 40px;
+}
+
+/* .back-link "返回"链接 — 文章详情页顶部的返回按钮 */
+.back-link {
+  /* 行内块 */
+  display: inline-flex;
+  /* 交叉轴居中 */
+  align-items: center;
+  /* 间距 4px（箭头和文字之间） */
+  gap: 4px;
+  /* 底部外边距 20px */
+  margin-bottom: 20px;
+  /* 字号 14px */
+  font-size: 14px;
+  /* 颜色为次要文字色 */
+  color: var(--text-secondary);
+  /* 颜色过渡 */
+  transition: color 0.2s;
+}
+
+/* .post-detail 文章详情容器 */
+.post-detail {
+  /* 背景为卡片背景色 */
+  background-color: var(--card-bg);
+  /* 内边距 48px */
+  padding: 48px;
+  /* 圆角 20px */
+  border-radius: 20px;
+  /* 边框 */
+  border: 1px solid var(--border);
+  /* 阴影 */
+  box-shadow: 0 2px 12px var(--shadow);
+}
+
+/* .post-detail-title 文章详情页大标题 */
+.post-detail-title {
+  /* 字号 32px */
+  font-size: 32px;
+  /* 字重 700 */
+  font-weight: 700;
+  /* 颜色为主文字色 */
+  color: var(--text);
+  /* 行高 1.3 */
+  line-height: 1.3;
+  /* 底部外边距 10px */
+  margin-bottom: 10px;
+}
+
+/* .post-detail-meta 详情页元信息行（日期 + 分类） */
+.post-detail-meta {
+  /* 颜色次要文字色 */
+  color: var(--text-secondary);
+  /* 字号 14px */
+  font-size: 14px;
+  /* 底部外边距 20px */
+  margin-bottom: 20px;
+  /* flex 布局 */
+  display: flex;
+  /* 垂直居中 */
+  align-items: center;
+  /* 间距 12px */
+  gap: 12px;
+}
+
+/* .post-content 文章正文容器 */
+.post-content {
+  /* 顶部外边距 24px，与上方标签拉开距离 */
+  margin-top: 24px;
+}
+
+/* .post-content 内的 h2 标题样式 */
+.post-content h2 {
+  /* 字号 22px */
+  font-size: 22px;
+  /* 字重 600 */
+  font-weight: 600;
+  /* 上下外边距 24px / 10px */
+  margin: 28px 0 10px;
+  /* 颜色为主文字色 */
+  color: var(--text);
+}
+
+/* .post-content 内的 h3 标题样式 */
+.post-content h3 {
+  /* 字号 18px */
+  font-size: 18px;
+  /* 字重 600 */
+  font-weight: 600;
+  /* 上下外边距 20px / 8px */
+  margin: 20px 0 8px;
+  /* 颜色为主文字色 */
+  color: var(--text);
+}
+
+/* .post-content 内的段落样式 */
+.post-content p {
+  /* 底部外边距 16px，段落间距 */
+  margin-bottom: 16px;
+  /* 行高 1.8，舒适阅读 */
+  line-height: 1.8;
+}
+
+/* .post-content 内的无序/有序列表样式 */
+.post-content ul,
+.post-content ol {
+  /* 底部外边距 16px */
+  margin-bottom: 16px;
+  /* 左内边距 24px，为项目符号留空间 */
+  padding-left: 24px;
+}
+
+/* .post-content 内的列表项样式 */
+.post-content li {
+  /* 底部外边距 6px */
+  margin-bottom: 6px;
+  /* 行高 1.8 */
+  line-height: 1.8;
+}
+
+/* .post-content 内的行内代码 <code> 样式 */
+.post-content code {
+  /* 背景色为标签背景色 */
+  background-color: var(--tag-bg);
+  /* 内边距 2px 6px */
+  padding: 2px 6px;
+  /* 圆角 4px */
+  border-radius: 4px;
+  /* 字号 14px，略小于正文 */
+  font-size: 14px;
+  /* 等宽字体 */
+  font-family: 'Consolas', 'Monaco', monospace;
+  /* 颜色为主色调 */
+  color: var(--primary);
+}
+
+/* .post-content 内的代码块 <pre><code> 样式 */
+.post-content pre {
+  /* 背景色 — 深色代码背景（日间夜间均使用深色底） */
+  background-color: #1e1e2e;
+  /* 内边距 20px */
+  padding: 20px;
+  /* 圆角 12px */
+  border-radius: 12px;
+  /* 底部外边距 16px */
+  margin-bottom: 16px;
+  /* 水平方向溢出时自动滚动 */
+  overflow-x: auto;
+}
+
+/* .post-content 内代码块中的 <code> 覆盖行内代码样式 */
+.post-content pre code {
+  /* 背景透明 */
+  background-color: transparent;
+  /* 内边距 0 */
+  padding: 0;
+  /* 颜色为浅色 */
+  color: #e0e0e0;
+  /* 字号 14px */
+  font-size: 14px;
+  /* 行高 1.6 */
+  line-height: 1.6;
+}
+
+/* .post-content 内的 h4 小标题样式（Markdown #### 四级标题） */
+.post-content h4 {
+  /* 字号 16px */
+  font-size: 16px;
+  /* 字重 600 */
+  font-weight: 600;
+  /* 上下外边距 16px / 6px */
+  margin: 16px 0 6px;
+  /* 颜色为主文字色 */
+  color: var(--text);
+}
+
+/* .post-content 内的 h5/h6 极小标题样式 */
+.post-content h5,
+.post-content h6 {
+  /* 字号 14px */
+  font-size: 14px;
+  /* 字重 600 */
+  font-weight: 600;
+  /* 上下外边距 12px / 4px */
+  margin: 12px 0 4px;
+  /* 颜色为次要文字色（层级最低） */
+  color: var(--text-secondary);
+}
+
+/* .post-content 内的粗体 <strong> 样式 */
+.post-content strong {
+  /* 字重 700 */
+  font-weight: 700;
+  /* 颜色为主文字色，突出强调 */
+  color: var(--text);
+}
+
+/* .post-content 内的斜体 <em> 样式 */
+.post-content em {
+  /* 斜体 */
+  font-style: italic;
+}
+
+/* .post-content 内的引用块 <blockquote> 样式（Markdown > 引用） */
+.post-content blockquote {
+  /* 左侧 4px 主色调边框（装饰条） */
+  border-left: 4px solid var(--primary);
+  /* 背景为标签色（轻微着色区分） */
+  background-color: var(--tag-bg);
+  /* 内边距 14px 20px */
+  padding: 14px 20px;
+  /* 底部外边距 16px */
+  margin-bottom: 16px;
+  /* 圆角 0 8px 8px 0（左侧无圆角贴合边框） */
+  border-radius: 0 8px 8px 0;
+  /* 颜色为次要文字色（引用内容稍弱化） */
+  color: var(--text-secondary);
+}
+
+/* .post-content 内引用块中的最后一段去除底部间距 */
+.post-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* .post-content 内的水平线 <hr> 样式（Markdown ---） */
+.post-content hr {
+  /* 无边框 */
+  border: none;
+  /* 高度 1px */
+  height: 1px;
+  /* 背景为边框色（浅灰分割线） */
+  background-color: var(--border);
+  /* 上下外边距 24px */
+  margin: 24px 0;
+}
+
+/* .post-content 内的图片样式（Markdown ![alt](url)） */
+.post-content img {
+  /* 最大宽度 100% */
+  max-width: 100%;
+  /* 高度自适应 */
+  height: auto;
+  /* 圆角 8px */
+  border-radius: 8px;
+  /* 底部外边距 16px */
+  margin-bottom: 16px;
+  /* 垂直方向与文字底部对齐 */
+  vertical-align: middle;
+}
+
+/* .post-content 内的表格容器样式（marked.js 默认不包一层容器，直接渲染 table） */
+.post-content table {
+  /* 宽度 100% */
+  width: 100%;
+  /* 底部外边距 16px */
+  margin-bottom: 16px;
+  /* 边框合并（单线边框效果） */
+  border-collapse: collapse;
+  /* 字号 14px（表格内容略小） */
+  font-size: 14px;
+}
+
+/* .post-content 内的表头单元格 <th> 样式 */
+.post-content th {
+  /* 背景为标签色 */
+  background-color: var(--tag-bg);
+  /* 字重 600 */
+  font-weight: 600;
+  /* 颜色为主文字色 */
+  color: var(--text);
+  /* 内边距 10px 14px */
+  padding: 10px 14px;
+  /* 左对齐 */
+  text-align: left;
+  /* 底部 2px 主色调边框（区分表头与表体） */
+  border-bottom: 2px solid var(--primary);
+}
+
+/* .post-content 内的表体单元格 <td> 样式 */
+.post-content td {
+  /* 内边距 10px 14px */
+  padding: 10px 14px;
+  /* 底部 1px 边框 */
+  border-bottom: 1px solid var(--border);
+  /* 颜色为主文字色 */
+  color: var(--text);
+}
+
+/* .post-content 内表体行悬停态 — 行高亮 */
+.post-content tbody tr:hover {
+  /* 背景为标签色 */
+  background-color: var(--tag-bg);
+}
+
+/* .post-content 内的行内链接样式（Markdown [text](url)） */
+.post-content a {
+  /* 颜色为主色调 */
+  color: var(--primary);
+  /* 底部 1px 虚线（区分正文链接） */
+  text-decoration: underline;
+  /* 装饰线颜色透明度低 */
+  text-decoration-color: rgba(76, 175, 150, 0.4);
+  /* 下划线偏移 2px（与文字拉开间距） */
+  text-underline-offset: 2px;
+}
+
+/* .post-content 内链接悬停态 */
+.post-content a:hover {
+  /* 颜色变深 */
+  color: var(--primary-hover);
+  /* 装饰线颜色变实 */
+  text-decoration-color: var(--primary-hover);
+}
+
+
+/* ==================== 分类页 ==================== */
+
+/* .category-list 分类列表容器 */
+.category-list {
+  /* CSS Grid 布局 */
+  display: grid;
+  /* 三列等宽 */
+  grid-template-columns: repeat(3, 1fr);
+  /* 间距 20px */
+  gap: 20px;
+}
+
+/* .category-card 分类卡片 */
+.category-card {
+  /* 背景为卡片色 */
+  background-color: var(--card-bg);
+  /* 内边距 32px 24px */
+  padding: 32px 24px;
+  /* 圆角 16px */
+  border-radius: 16px;
+  /* 边框 */
+  border: 1px solid var(--border);
+  /* 阴影 */
+  box-shadow: 0 2px 8px var(--shadow);
+  /* 鼠标手型 */
+  cursor: pointer;
+  /* 过渡动画 */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* 文字居中对齐 */
+  text-align: center;
+}
+
+/* 分类卡片悬停态 */
+.category-card:hover {
+  /* 阴影加深 */
+  box-shadow: 0 8px 24px var(--shadow-hover);
+  /* 上移 4px */
+  transform: translateY(-4px);
+  /* 边框色变为主色调 */
+  border-color: var(--primary);
+}
+
+/* 分类卡片内的图标 Emoji */
+.category-icon {
+  /* 字号 40px */
+  font-size: 40px;
+  /* 底部外边距 12px */
+  margin-bottom: 12px;
+  /* 行高 1 */
+  line-height: 1;
+}
+
+/* 分类卡片内的 h3 标题（分类名称） */
+.category-card h3 {
+  /* 字号 18px */
+  font-size: 18px;
+  /* 颜色为主文字色 */
+  color: var(--text);
+  /* 底部外边距 4px */
+  margin-bottom: 4px;
+}
+
+/* .category-count 分类文章数量文本 */
+.category-count {
+  /* 颜色次要文字色 */
+  color: var(--text-secondary);
+  /* 字号 13px */
+  font-size: 13px;
+}
+
+
+/* ==================== 归档页 ==================== */
+
+/* .archive-year 归档年份区块 */
+.archive-year {
+  /* 底部外边距 32px */
+  margin-bottom: 32px;
+}
+
+/* .archive-year 内的 h3（年份标题） */
+.archive-year h3 {
+  /* 字号 20px */
+  font-size: 20px;
+  /* 字重 700 */
+  font-weight: 700;
+  /* 颜色为主色调 */
+  color: var(--primary);
+  /* 底部外边距 14px */
+  margin-bottom: 14px;
+  /* 左侧 4px 实线主色调边框（装饰条） */
+  border-left: 4px solid var(--primary);
+  /* 左内边距 12px */
+  padding-left: 12px;
+}
+
+/* .archive-list 归档时间线列表 — 带左侧装饰线 */
+.archive-list {
+  /* 移除默认列表样式 */
+  list-style: none;
+  /* 左侧内边距 20px，为时间线装饰线留空间 */
+  padding-left: 20px;
+  /* 左侧边框线（时间线主轴） */
+  border-left: 2px solid var(--border);
+}
+
+/* .archive-item 归档时间线条目 */
+.archive-item {
+  /* 相对定位（为圆点标记提供基准） */
+  position: relative;
+  /* 内边距 12px 0 */
+  padding: 12px 0 12px 24px;
+  /* 鼠标手型 */
+  cursor: pointer;
+  /* all 过渡 */
+  transition: all 0.2s;
+  /* flex 布局 */
+  display: flex;
+  /* 交叉轴居中 */
+  align-items: center;
+  /* 间距 16px */
+  gap: 16px;
+}
+
+/* .archive-item::before 归档条目左侧的圆点标记 */
+.archive-item::before {
+  /* 内容为空 */
+  content: '';
+  /* 绝对定位 */
+  position: absolute;
+  /* 距左 -29px（对齐到时间线主轴上） */
+  left: -29px;
+  /* 垂直居中 */
+  top: 50%;
+  /* 向上偏移自身高度一半 */
+  transform: translateY(-50%);
+  /* 宽高 10px */
+  width: 10px;
+  height: 10px;
+  /* 圆形 */
+  border-radius: 50%;
+  /* 背景为主色调 */
+  background-color: var(--primary);
+  /* 白色边框 2px（与时间线主轴区分） */
+  border: 2px solid var(--card-bg);
+  /* 过渡 */
+  transition: transform 0.2s;
+}
+
+/* 归档条目悬停时圆点放大 */
+.archive-item:hover::before {
+  /* 放大 1.3 倍 */
+  transform: translateY(-50%) scale(1.3);
+}
+
+/* 归档条目悬停态 */
+.archive-item:hover {
+  /* 颜色变为主色调 */
+  color: var(--primary);
+}
+
+/* .archive-date 归档条目中的日期文本 */
+.archive-date {
+  /* 颜色次要文字色 */
+  color: var(--text-secondary);
+  /* 字号 13px */
+  font-size: 13px;
+  /* 固定宽度 56px，使标题对齐 */
+  width: 56px;
+  /* 不收缩 */
+  flex-shrink: 0;
+  /* 等宽字体，日期对齐整齐 */
+  font-family: 'Consolas', monospace;
+}
+
+/* .archive-title 归档条目中的文章标题 */
+.archive-title {
+  /* 字号 15px */
+  font-size: 15px;
+  /* 颜色为主文字色 */
+  color: var(--text);
+  /* 悬停时颜色跟随父级 */
+  transition: color 0.2s;
+}
+
+/* 归档条目悬停时标题颜色变为主色调 */
+.archive-item:hover .archive-title {
+  color: var(--primary);
+}
+
+
+/* ==================== 关于页 ==================== */
+
+/* .about-content 关于页内容容器 */
+.about-content {
+  /* 背景卡片色 */
+  background-color: var(--card-bg);
+  /* 内边距 48px 40px */
+  padding: 48px 40px;
+  /* 圆角 20px */
+  border-radius: 20px;
+  /* 边框 */
+  border: 1px solid var(--border);
+  /* 阴影 */
+  box-shadow: 0 2px 12px var(--shadow);
+  /* 文字居中 */
+  text-align: center;
+  /* 最大宽度 680px 居中 */
+  max-width: 680px;
+  /* 左右 auto 居中 */
+  margin: 0 auto;
+}
+
+/* .about-avatar 关于页头像 */
+.about-avatar {
+  /* 字号 72px */
+  font-size: 72px;
+  /* 底部外边距 16px */
+  margin-bottom: 16px;
+}
+
+/* .about-content 内的 h3（博主名称） */
+.about-content h3 {
+  /* 字号 24px */
+  font-size: 24px;
+  /* 颜色主文字色 */
+  color: var(--text);
+  /* 底部外边距 16px */
+  margin-bottom: 16px;
+}
+
+/* .about-content 内的段落 */
+.about-content p {
+  /* 颜色次要文字色 */
+  color: var(--text-secondary);
+  /* 行高 1.8 */
+  line-height: 1.8;
+  /* 底部外边距 12px */
+  margin-bottom: 12px;
+  /* 最大宽度 480px，居中 */
+  max-width: 480px;
+  /* 左右 auto 居中 */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* .about-content 内的 h4（小标题） */
+.about-content h4 {
+  /* 字号 16px */
+  font-size: 16px;
+  /* 颜色主文字色 */
+  color: var(--text);
+  /* 上下外边距 24px / 10px */
+  margin: 28px 0 10px;
+}
+
+/* .about-skills 技能标签容器 */
+.about-skills {
+  /* flex 布局居中 */
+  display: flex;
+  /* 水平居中排列 */
+  justify-content: center;
+  /* 自动换行 */
+  flex-wrap: wrap;
+  /* 标签间距 8px */
+  gap: 8px;
+  /* 底部外边距 8px */
+  margin-bottom: 8px;
+}
+
+/* .skill-tag 技能标签 */
+.skill-tag {
+  /* 行内块 */
+  display: inline-block;
+  /* 内边距 5px 14px */
+  padding: 5px 14px;
+  /* 字号 14px */
+  font-size: 14px;
+  /* 颜色主色调 */
+  color: var(--primary);
+  /* 背景标签色 */
+  background-color: var(--tag-bg);
+  /* 圆角 20px（胶囊形） */
+  border-radius: 20px;
+  /* 字重 500 */
+  font-weight: 500;
+}
+
+/* .about-contact 联系方式列表 */
+.about-contact {
+  /* 列表样式：无默认符号 */
+  list-style: none;
+  /* 行内块居中 */
+  display: inline-block;
+  /* 文字左对齐 */
+  text-align: left;
+}
+
+/* .about-contact 内的列表项 */
+.about-contact li {
+  /* 底部外边距 10px */
+  margin-bottom: 10px;
+  /* 颜色次要文字色 */
+  color: var(--text-secondary);
+  /* 字号 15px */
+  font-size: 15px;
+}
+
+
+/* ==================== 空状态 ==================== */
+
+/* .empty-state 空状态容器 */
+.empty-state {
+  /* 文字居中 */
+  text-align: center;
+  /* 上下内边距 80px */
+  padding: 80px 20px;
+  /* 颜色次要文字色 */
+  color: var(--text-secondary);
+}
+
+/* .empty-state 内的段落 */
+.empty-state p {
+  /* 字号 18px */
+  font-size: 18px;
+  /* 底部外边距 16px */
+  margin-bottom: 16px;
+}
+
+/* .empty-state 内的链接（"返回首页"） */
+.empty-state a {
+  /* 字号 15px */
+  font-size: 15px;
+}
+
+
+/* ==================== 页脚 ==================== */
+
+/* .footer 底部页脚区域 */
+.footer {
+  /* 背景卡片色 */
+  background-color: var(--card-bg);
+  /* 顶部 1px 边框 */
+  border-top: 1px solid var(--border);
+  /* 内边距 28px 24px */
+  padding: 28px 24px;
+  /* 文字居中 */
+  text-align: center;
+  /* 颜色次要文字色 */
+  color: var(--text-secondary);
+  /* 字号 14px */
+  font-size: 14px;
+}
+
+/* .footer 内的链接颜色 */
+.footer a {
+  /* 颜色主色调 */
+  color: var(--primary);
+}
+
+
+/* ==================== 回到顶部按钮 ==================== */
+
+/* #back-to-top 回到顶部按钮 — 默认隐藏 */
+#back-to-top {
+  /* 固定定位 */
+  position: fixed;
+  /* 距底部 30px */
+  bottom: 30px;
+  /* 距右侧 30px */
+  right: 30px;
+  /* 宽高 46px */
+  width: 46px;
+  height: 46px;
+  /* 渐变背景 */
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  /* 文字白色 */
+  color: #fff;
+  /* 无边框 */
+  border: none;
+  /* 圆角 50%（圆形） */
+  border-radius: 50%;
+  /* 字号 20px */
+  font-size: 20px;
+  /* 鼠标手型 */
+  cursor: pointer;
+  /* 阴影 */
+  box-shadow: 0 4px 12px var(--shadow-hover);
+  /* 默认不可见（透明度为 0） */
+  opacity: 0;
+  /* 指针事件设为 none，默认不响应点击 */
+  pointer-events: none;
+  /* 透明度和位移过渡 */
+  transition: opacity 0.3s, transform 0.3s;
+  /* z-index 高层级 */
+  z-index: 99;
+}
+
+/* #back-to-top.visible 按钮可见态 */
+#back-to-top.visible {
+  /* 透明度为 1（可见） */
+  opacity: 1;
+  /* 恢复指针事件 */
+  pointer-events: auto;
+}
+
+/* 回到顶部按钮悬停态 */
+#back-to-top:hover {
+  /* 上移 3px */
+  transform: translateY(-3px);
+  /* 阴影加深 */
+  box-shadow: 0 6px 16px var(--shadow-hover);
+}
+
+
+/* ==================== 渐入动画 ==================== */
+
+/* .fade-in 渐入动画类 — 元素进入视口时添加 */
+.fade-in {
+  /* 初始状态：透明 + 下移 20px */
+  opacity: 0;
+  transform: translateY(20px);
+  /* 过渡动画 0.5 秒 */
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* .fade-in.visible 元素进入视口后的状态 */
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ==================== 响应式适配 ==================== */
+
+/* 平板端（≤992px）：文章网格单列，分类两列 */
+@media (max-width: 992px) {
+
+  /* 文章卡片网格 — 切换为单列 */
+  .post-grid {
+    /* 单列 */
+    grid-template-columns: 1fr;
+  }
+
+  /* 分类列表 — 两列 */
+  .category-list {
+    /* 两列 */
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Hero 标题略小 */
+  .hero-title {
+    font-size: 30px;
+  }
+}
+
+/* 桌面端（993px~1440px）：文章两列 */
+@media (min-width: 993px) and (max-width: 1440px) {
+  /* 文章卡片网格保持两列 */
+  .post-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 超宽屏（≥1441px）：文章三列，充分利用屏幕空间 */
+@media (min-width: 1441px) {
+  /* 文章卡片网格 — 三列 */
+  .post-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* 分类列表 — 四列 */
+  .category-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* 移动端适配（≤767px）— 手机 */
+@media (max-width: 767px) {
+
+  /* 导航栏容器 — 减小内边距 */
+  .nav-container {
+    /* 内边距缩小 */
+    padding: 12px 16px;
+  }
+
+  /* 导航栏 Logo — 缩小字号 */
+  .nav-logo {
+    font-size: 18px;
+  }
+
+  /* 导航菜单 — 缩小间距 */
+  .nav-menu {
+    gap: 14px;
+  }
+
+  /* 导航链接 — 缩小字号 */
+  .nav-link {
+    font-size: 14px;
+  }
+
+  /* 搜索框 — 缩小宽度 */
+  .nav-search {
+    width: 120px;
+  }
+
+  /* Hero — 减小内边距 */
+  .hero {
+    padding: 40px 20px 36px;
+    margin-bottom: 32px;
+    border-radius: 16px;
+  }
+
+  /* Hero 标题 — 缩小 */
+  .hero-title {
+    font-size: 26px;
+  }
+
+  /* Hero 统计 — 缩小间距 */
+  .hero-stats {
+    gap: 32px;
+  }
+
+  /* 主内容区域 — 减小左右内边距 */
+  .main-content {
+    padding: 0 16px 48px;
+  }
+
+  /* 页面大标题 — 缩小 */
+  .page-title {
+    font-size: 22px;
+  }
+
+  /* 文章详情容器 — 减小内边距 */
+  .post-detail {
+    padding: 28px 20px;
+    border-radius: 16px;
+  }
+
+  /* 详情页大标题 — 缩小 */
+  .post-detail-title {
+    font-size: 24px;
+  }
+
+  /* 分类卡片 — 单列 */
+  .category-list {
+    grid-template-columns: 1fr;
+  }
+
+  /* 关于页内容 — 减小内边距 */
+  .about-content {
+    padding: 32px 24px;
+  }
+
+  /* 回到顶部按钮 — 缩小并靠近边缘 */
+  #back-to-top {
+    width: 42px;
+    height: 42px;
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+/* 超小屏幕（≤480px）— 手机竖屏 */
+@media (max-width: 480px) {
+
+  /* 导航菜单 — 紧凑 */
+  .nav-menu {
+    gap: 10px;
+  }
+
+  /* 搜索框隐藏 — 空间不足 */
+  .nav-search {
+    display: none;
+  }
+
+  /* Hero 统计 — 缩小间距 */
+  .hero-stats {
+    gap: 24px;
+  }
+
+  /* Hero 统计数字 — 缩小 */
+  .hero-stat-num {
+    font-size: 24px;
+  }
+}
